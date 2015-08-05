@@ -1,6 +1,7 @@
 package com.tom.chapter7;
 
 import android.app.Activity;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
@@ -11,6 +12,7 @@ import android.view.MenuItem;
 
 public class MainActivity extends Activity {
     MyPhoneListener listener;
+    MyReceiver receiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -18,6 +20,7 @@ public class MainActivity extends Activity {
         listener = new MyPhoneListener();
         TelephonyManager manager = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
         manager.listen(listener  , PhoneStateListener.LISTEN_CALL_STATE);
+        receiver = new MyReceiver();
     }
 
     class MyPhoneListener extends PhoneStateListener{
@@ -25,6 +28,18 @@ public class MainActivity extends Activity {
         public void onCallStateChanged(int state, String number) {
             Log.d("MyPhoneListener", state+"/"+number);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(receiver, new IntentFilter("android.intent.action.PHONE_STATE"));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(receiver);
     }
 
     @Override
